@@ -17,6 +17,7 @@ var SidebarComponent = (function () {
         this.sidebar = sidebar;
         this.sidebarClass = 'sidebar-dark bg-primary';
         this.position = 'left';
+        this.isActive = true;
     }
     Object.defineProperty(SidebarComponent.prototype, "selector", {
         get: function () {
@@ -26,10 +27,20 @@ var SidebarComponent = (function () {
         configurable: true
     });
     SidebarComponent.prototype.ngAfterViewInit = function () {
+        var _this = this;
         this.sidebar.init(this.selector);
+        if (this.onToggle)
+            this.onToggle.subscribe(function (show) { return _this.toggle(show); });
+        if (!this.isActive)
+            this.sidebar.hide(this.selector);
     };
     SidebarComponent.prototype.ngOnDestroy = function () {
         this.sidebar.destroy(this.selector);
+        if (this.onToggle)
+            this.onToggle.unsubscribe();
+    };
+    SidebarComponent.prototype.toggle = function (show) {
+        show ? this.sidebar.show(this.selector) : this.sidebar.hide(this.selector);
     };
     __decorate([
         core_1.Input('sidebar-id'), 
@@ -43,10 +54,18 @@ var SidebarComponent = (function () {
         core_1.Input('sidebar-position'), 
         __metadata('design:type', String)
     ], SidebarComponent.prototype, "position", void 0);
+    __decorate([
+        core_1.Input('onToggle'), 
+        __metadata('design:type', core_1.EventEmitter)
+    ], SidebarComponent.prototype, "onToggle", void 0);
+    __decorate([
+        core_1.Input('isActive'), 
+        __metadata('design:type', Boolean)
+    ], SidebarComponent.prototype, "isActive", void 0);
     SidebarComponent = __decorate([
         core_1.Component({
             selector: 'ng2-bl-sidebar',
-            template: "\n\t\t<div class=\"sidebar\" [id]=\"id\" [ngClass]=\"sidebarClass\" [attr.data-position]=\"position\" ng2-bl-scrollable>\n\t\t\t<ng-content></ng-content>\n\t\t</div>\n\t",
+            template: "\n\t\t<div class=\"sidebar\" [id]=\"id\" \n\t\t\t[ngClass]=\"sidebarClass\" \n\t\t\t[attr.data-position]=\"position\"\n\t\t\tng2-bl-scrollable>\n\t\t\t<ng-content></ng-content>\n\t\t</div>\n\t",
             directives: [
                 scrollable_directive_1.ScrollableDirective
             ]
